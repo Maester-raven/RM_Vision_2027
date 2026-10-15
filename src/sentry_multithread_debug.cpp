@@ -97,6 +97,50 @@ int main(int argc, char * argv[])
                   ? yaml["omni_fov_v_" + std::to_string(i)].as<double>()
                   : 44.5;
 
+    // 标定角度解算默认关闭，保持原有 FOV 行为
+    cfg.use_calibrated_angle = yaml["omni_use_calibrated_angle"]
+                             ? yaml["omni_use_calibrated_angle"].as<bool>()
+                             : false;
+    if (cfg.use_calibrated_angle) {
+      const auto calibration_key = "calibration_file_omni" + std::to_string(i);
+      if (!yaml[calibration_key]) {
+        tools::logger()->warn(
+          "[{}] calibration file is not configured, fallback to FOV",
+          sursign);
+        cfg.use_calibrated_angle = false;
+      }
+      else {
+        const std::string calibration_path = yaml[calibration_key].as<std::string>();
+        cv::FileStorage fs(calibration_path, cv::FileStorage::READ);
+
+        if (!fs.isOpened()) {
+          tools::logger()->warn(
+            "[{}] cannot open calibration file: {}, fallback to FOV",
+            sursign, calibration_path);
+          cfg.use_calibrated_angle = false;
+        }
+        else {
+          fs["camera_matrix"] >> cfg.camera_matrix;
+          fs["distortion_coefficients"] >> cfg.distort_coeffs;
+
+          if (cfg.camera_matrix.empty() || cfg.distort_coeffs.empty()) {
+            tools::logger()->warn(
+              "[{}] invalid calibration file: {}, fallback to FOV",
+              sursign, calibration_path);
+
+            cfg.camera_matrix.release();
+            cfg.distort_coeffs.release();
+            cfg.use_calibrated_angle = false;
+          }
+          else {
+            tools::logger()->info(
+              "[{}] loaded calibration: {}",
+              sursign, calibration_path);
+          }
+        }
+      }
+    }
+
     omni_configs.push_back(cfg);
     omni_cameras.push_back(std::move(cam));
   }

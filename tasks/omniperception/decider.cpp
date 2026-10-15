@@ -1,9 +1,11 @@
 #include "decider.hpp"
+#include "angle_solver.hpp"
 
 #include <yaml-cpp/yaml.h>
 
 #include <algorithm>
 #include <cmath>
+#include <exception>
 #include <filesystem>
 #include <opencv2/opencv.hpp>
 
@@ -94,10 +96,43 @@ void Decider::clear_angle_stack()
 Eigen::Vector2d Decider::delta_angle(
   const std::list<auto_aim::Armor> & armors, const OmniCameraConfig & cfg)
 {
-  Eigen::Vector2d da;
-  da[0] = cfg.mount_yaw + (cfg.fov_h / 2) - armors.front().center_norm.x * cfg.fov_h;
-  da[1] = armors.front().center_norm.y * cfg.fov_v - cfg.fov_v / 2 + cfg.mount_pitch;
-  return da;
+  const auto & armor = armors.front();
+
+  // Original FOV-based algorithm.
+  const auto fov_angle = [&]() {
+    Eigen::Vector2d da;
+    da[0] = cfg.mount_yaw + (cfg.fov_h / 2) - armor.center_norm.x * cfg.fov_h;
+    da[1] = armor.center_norm.y * cfg.fov_v - cfg.fov_v / 2 + cfg.mount_pitch;
+    return da;
+  };
+
+  // Preserve the original behaviour unless explicitly enabled.
+  if (!cfg.use_calibrated_angle) {
+    return fov_angle();
+  }
+
+  if (cfg.camera_matrix.empty() || cfg.distort_coeffs.empty()) {
+    tools::logger()->warn(
+      "Omni calibrated angle enabled but calibration parameters are missing, fallback to FOV");
+    return fov_angle();
+  }
+
+  try {
+    const Eigen::Vector2d camera_angle =
+      AngleSolver::solve(armor, cfg.camera_matrix, cfg.distort_coeffs);
+
+    return {
+      cfg.mount_yaw + camera_angle[0],
+      cfg.mount_pitch + camera_angle[1]
+    };
+  }
+  catch (const std::exception & e) {
+    tools::logger()->warn(
+      "Omni AngleSolver failed: {}, fallback to FOV",
+      e.what());
+
+    return fov_angle();
+  }
 }
 
 /*

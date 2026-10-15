@@ -1,0 +1,36 @@
+%YAML:1.0
+---
+camera_model: MV-CB016-10UC-S
+serial_number: DA6415777
+lens: "3.37mm F2.8"
+image_width: 640
+image_height: 480
+offset_x: 372
+offset_y: 156
+reverse_x: 1
+binning_horizontal: 1
+binning_vertical: 1
+decimation_horizontal: 1
+decimation_vertical: 1
+camera_matrix: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ 9.6785421432999999e+02, 0., 3.0277130392999999e+02, 0.,
+       9.6638511616000005e+02, 3.4768952457000000e+02, 0., 0., 1. ]
+distortion_coefficients: !!opencv-matrix
+   rows: 5
+   cols: 1
+   dt: d
+   data: [ 4.6235070000000003e-02, -6.4779219999999998e-02,
+       -3.6204999999999999e-04, 7.7141000000000004e-04,
+       8.8050200000000002e-03 ]
+board_squares_x: 13
+board_squares_y: 9
+inner_corners_x: 12
+inner_corners_y: 8
+square_size_mm: 30.
+full_frame_width: 1440
+full_frame_height: 1080
+full_frame_rms: 3.7171088705844257e-01
+calibration_date: "2026-09-16"

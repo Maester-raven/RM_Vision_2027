@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <opencv2/core.hpp>
 
 #include "io/camera.hpp"
 #include "tasks/auto_aim/armor.hpp"
@@ -26,6 +27,12 @@ struct OmniCameraConfig
   double mount_pitch;  // degrees
   double fov_h;        // degrees
   double fov_v;        // degrees
+
+  // Calibrated angle solver.
+  // Disabled by default to preserve the original FOV behaviour.
+  bool use_calibrated_angle = false;
+  cv::Mat camera_matrix;
+  cv::Mat distort_coeffs;
 };
 
 //一个识别结果可能包含多个armor,需要排序和过滤。armors, timestamp, delta_yaw, delta_pitch

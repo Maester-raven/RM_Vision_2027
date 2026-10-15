@@ -7,5 +7,6 @@ find_package(OpenVINO REQUIRED COMPONENTS Runtime)
 add_library(omniperception OBJECT 
     decider.cpp
     perceptron.cpp
+    angle_solver.cpp
 )
 target_link_libraries(omniperception openvino::runtime)

@@ -1,0 +1,23 @@
+%YAML:1.0
+---
+serial_number: DA6415771
+
+image_width: 640
+image_height: 480
+offset_x: 488
+offset_y: 428
+reverse_x: 0
+camera_matrix: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ 9.7013427538999997e+02, 0., 2.5835300294000001e+02, 0.,
+       9.6886224255000002e+02, 1.0926852711000004e+02, 0., 0., 1. ]
+distortion_coefficients: !!opencv-matrix
+   rows: 5
+   cols: 1
+   dt: d
+   data: [ 4.8672449999999999e-02, -8.0705630000000000e-02,
+       -1.1765000000000000e-03, -8.1667000000000003e-04,
+       3.0559989999999999e-02 ]
+full_frame_rms: 4.3891666976781107e-01
